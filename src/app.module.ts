@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './auth/jwt/jwt.constants';
 import { RolesModule } from './roles/roles.module';
+import { CategoriesModule } from './categories/categories.module';
 
 
 @Module({
@@ -23,7 +24,8 @@ import { RolesModule } from './roles/roles.module';
     }),
     UsersModule,
     AuthModule,
-    RolesModule
+    RolesModule,
+    CategoriesModule
   ],
   controllers: [AppController],
   providers: [AppService],
