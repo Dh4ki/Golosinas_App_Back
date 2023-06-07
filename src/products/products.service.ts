@@ -38,6 +38,33 @@ export class ProductsService {
         return savedProduct;
     }
 
+    async UpdateWithImages(files: Array<Express.Multer.File>, id: number, product: UpdateProductDto){
+        if (files.length === 0) {
+            throw new HttpException("Las imagenes son obligatorias", HttpStatus.NOT_FOUND);
+        }
+        let counter = 0;
+        let uploadedFiles = Number(product.images_to_update[counter]); //CONTAR CUANTOS ARCHIVOS SE HAN SUBIDO A FIREBASE
+        const updatedProduct = await this.update(id, product);
+        const startForEach = async () => {
+            await asyncForEach(files, async (file: Express.Multer.File) => {
+                const url = await storage(file, file.originalname);
+                if (url !== undefined && url !== null) {
+                    if (uploadedFiles === 0) {
+                        updatedProduct.image1 = url
+                    }
+                    else if (uploadedFiles === 1) {
+                        updatedProduct.image2 = url
+                    }
+                }
+                await this.update(updatedProduct.id, updatedProduct);
+                counter++;
+                uploadedFiles = Number(product.images_to_update[counter]);
+            })
+        }
+        await startForEach();
+        return updatedProduct;
+    }
+
 
     async update(id: number, product: UpdateProductDto){
         const productFound = await this.productsRepository.findOneBy({ id: id});
