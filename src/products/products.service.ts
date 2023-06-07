@@ -12,6 +12,14 @@ export class ProductsService {
 
     constructor(@InjectRepository(Product) private productsRepository: Repository<Product>){}
 
+    findAll() {
+        return this.productsRepository.find();
+    }
+
+    findByCategory(id_category: number) {
+        return this.productsRepository.findBy({ id_category:  id_category});
+    }
+
     async create(files: Array<Express.Multer.File>, product: CreateProductDto){
         if (files.length === 0) {
             throw new HttpException("Las imagenes son obligatorias", HttpStatus.NOT_FOUND);
@@ -73,6 +81,13 @@ export class ProductsService {
         }
         const updateProduct = Object.assign(productFound, product);
         return this.productsRepository.save(updateProduct);
+    }
 
+    async delete(id: number){
+        const productFound = await this.productsRepository.findOneBy({ id: id});
+        if (!productFound) {
+            throw new HttpException("Producto no encontrado", HttpStatus.NOT_FOUND);
+        }
+        return this.productsRepository.delete(id);
     }
 }
